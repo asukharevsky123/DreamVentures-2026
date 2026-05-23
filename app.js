@@ -128,6 +128,7 @@ const freshnessRange = document.querySelector("#freshnessRange");
 const freshnessLabel = document.querySelector("#freshnessLabel");
 const timeRange = document.querySelector("#timeRange");
 const timeLabel = document.querySelector("#timeLabel");
+const quickTimeSelect = document.querySelector("#quickTimeSelect");
 const onlineInput = document.querySelector("#onlineInput");
 const onlinePerson = document.querySelector("#onlinePerson");
 const onlineButton = document.querySelector("#onlineButton");
@@ -152,6 +153,7 @@ profile.dislikes = profile.dislikes || [];
 profile.cuisines = profile.cuisines || [];
 freshnessRange.value = freshnessLevel;
 timeRange.value = maxTime;
+quickTimeSelect.value = String(maxTime);
 
 function loadFromStorage(key, fallback) {
   const saved = localStorage.getItem(key);
@@ -294,6 +296,8 @@ function renderFreshness() {
 
 function renderTime() {
   timeLabel.textContent = "Up to " + maxTime + " minutes.";
+  timeRange.value = maxTime;
+  quickTimeSelect.value = String(maxTime);
 }
 
 function renderOnlineMemory() {
@@ -526,6 +530,12 @@ freshnessRange.addEventListener("input", function() {
 
 timeRange.addEventListener("input", function() {
   maxTime = Number(timeRange.value);
+  localStorage.setItem("vetochef-max-time", maxTime);
+  render();
+});
+
+quickTimeSelect.addEventListener("change", function() {
+  maxTime = Number(quickTimeSelect.value);
   localStorage.setItem("vetochef-max-time", maxTime);
   render();
 });

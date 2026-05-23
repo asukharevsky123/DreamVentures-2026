@@ -182,6 +182,22 @@
   font-weight: 800;
 }
 
+.top-filter {
+  display: grid;
+  grid-template-columns: auto minmax(180px, 260px);
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+}
+
+.top-filter label {
+  color: var(--muted);
+  font-weight: 800;
+}
+
 .chip-list {
   display: flex;
   flex-wrap: wrap;
@@ -390,6 +406,10 @@
   }
 
   .meal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-filter {
     grid-template-columns: 1fr;
   }
 }
