@@ -41,9 +41,14 @@
   width: min(1180px, calc(100% - 40px));
   margin: 34px auto 70px;
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 370px 1fr;
   gap: 22px;
   align-items: start;
+}
+
+.app-stack {
+  display: grid;
+  gap: 18px;
 }
 
 .app-card {
@@ -78,19 +83,24 @@
   cursor: pointer;
 }
 
-.veto-form {
+.veto-form,
+.app-card {
   display: grid;
   gap: 10px;
 }
 
-.veto-form label {
+.veto-form label,
+.field-label {
   color: var(--muted);
   font-size: 0.9rem;
   font-weight: 800;
 }
 
 .veto-form input,
-.veto-form select {
+.veto-form select,
+.app-card input,
+.app-card select,
+.app-card textarea {
   width: 100%;
   min-height: 46px;
   border: 1px solid var(--line);
@@ -99,6 +109,12 @@
   background: #fffdf8;
   color: var(--ink);
   font: inherit;
+}
+
+.app-card textarea {
+  min-height: 100px;
+  padding: 12px;
+  resize: vertical;
 }
 
 .full-button {
@@ -153,6 +169,54 @@
   background: var(--green);
   text-align: center;
   font-weight: 800;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 34px;
+}
+
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.memory-list {
+  display: grid;
+  gap: 8px;
+}
+
+.memory-item {
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+}
+
+.memory-item strong {
+  display: block;
+}
+
+.memory-item span,
+.slider-note {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.slider-note {
+  margin: 0;
+}
+
+.meal-area {
+  position: sticky;
+  top: 18px;
 }
 
 .meal-grid {
@@ -224,6 +288,43 @@
   font-weight: 800;
 }
 
+.meal-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.rating-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rating-row button,
+.cook-button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 11px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cook-button {
+  width: 100%;
+  background: var(--ink);
+  color: white;
+}
+
+.rating-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .empty-state {
   grid-column: 1 / -1;
   padding: 28px;
@@ -236,6 +337,10 @@
 @media (max-width: 900px) {
   .app-layout {
     grid-template-columns: 1fr;
+  }
+
+  .meal-area {
+    position: static;
   }
 }
 
