@@ -10,6 +10,8 @@ const meals = [
     note: "Rice, salmon, cucumber, carrots, and lemon yogurt sauce.",
     tags: ["salmon", "rice", "mild", "pescatarian"],
     ingredients: ["salmon", "rice", "cucumber", "carrots", "lemon", "yogurt"],
+    cuisine: "mediterranean",
+    minutes: 30,
     freshness: 4,
     steps: [
       "Cook the rice.",
@@ -25,6 +27,8 @@ const meals = [
     note: "Ground turkey, beans, peppers, cheese, and warm tortillas.",
     tags: ["turkey", "beans", "peppers", "mild"],
     ingredients: ["turkey", "beans", "peppers", "cheese", "tortillas"],
+    cuisine: "mexican",
+    minutes: 25,
     freshness: 3,
     steps: [
       "Brown the turkey in a skillet.",
@@ -39,6 +43,8 @@ const meals = [
     note: "Creamy rice with mushrooms, parmesan, and herbs.",
     tags: ["mushrooms", "rice", "vegetarian"],
     ingredients: ["mushrooms", "rice", "parmesan", "broth", "herbs"],
+    cuisine: "italian",
+    minutes: 45,
     freshness: 2,
     steps: [
       "Cook mushrooms until browned.",
@@ -53,6 +59,8 @@ const meals = [
     note: "Noodles, shrimp, chili sauce, scallions, and lime.",
     tags: ["spicy", "shellfish", "noodles"],
     ingredients: ["shrimp", "noodles", "chili", "scallions", "lime"],
+    cuisine: "asian",
+    minutes: 20,
     freshness: 5,
     steps: [
       "Boil the noodles.",
@@ -67,6 +75,8 @@ const meals = [
     note: "Cheese pizza with side salad and optional toppings.",
     tags: ["pizza", "vegetarian", "mild"],
     ingredients: ["pizza", "cheese", "salad"],
+    cuisine: "italian",
+    minutes: 18,
     freshness: 1,
     steps: [
       "Heat the oven.",
@@ -81,6 +91,8 @@ const meals = [
     note: "Pasta, chicken, pesto, peas, and parmesan.",
     tags: ["chicken", "pasta", "mild"],
     ingredients: ["chicken", "pasta", "pesto", "peas", "parmesan"],
+    cuisine: "italian",
+    minutes: 35,
     freshness: 3,
     steps: [
       "Boil the pasta.",
@@ -95,7 +107,8 @@ const meals = [
 const knownTags = [
   "mushrooms", "spicy", "shellfish", "salmon", "rice", "turkey", "beans",
   "peppers", "pizza", "vegetarian", "mild", "chicken", "pasta", "pesto",
-  "shrimp", "noodles", "cheese", "quick"
+  "shrimp", "noodles", "cheese", "quick", "italian", "mexican", "asian",
+  "mediterranean"
 ];
 
 const vetoForm = document.querySelector("#vetoForm");
@@ -113,6 +126,8 @@ const overrideButton = document.querySelector("#overrideButton");
 const overrideList = document.querySelector("#overrideList");
 const freshnessRange = document.querySelector("#freshnessRange");
 const freshnessLabel = document.querySelector("#freshnessLabel");
+const timeRange = document.querySelector("#timeRange");
+const timeLabel = document.querySelector("#timeLabel");
 const onlineInput = document.querySelector("#onlineInput");
 const onlinePerson = document.querySelector("#onlinePerson");
 const onlineButton = document.querySelector("#onlineButton");
@@ -123,9 +138,20 @@ let pantryItems = loadFromStorage("vetochef-pantry", ["salmon", "rice", "chicken
 let tonightOverrides = [];
 let ratings = loadFromStorage("vetochef-ratings", {});
 let onlineLikes = loadFromStorage("vetochef-online-likes", []);
+let profile = loadFromStorage("vetochef-profile", {
+  name: "Our house",
+  likes: [],
+  dislikes: [],
+  cuisines: []
+});
 let freshnessLevel = Number(localStorage.getItem("vetochef-freshness")) || 3;
+let maxTime = Number(localStorage.getItem("vetochef-max-time")) || 40;
 
+profile.likes = profile.likes || [];
+profile.dislikes = profile.dislikes || [];
+profile.cuisines = profile.cuisines || [];
 freshnessRange.value = freshnessLevel;
+timeRange.value = maxTime;
 
 function loadFromStorage(key, fallback) {
   const saved = localStorage.getItem(key);
@@ -151,7 +177,13 @@ function mealIsAllowed(meal) {
     return meal.tags.includes(veto.item.toLowerCase());
   });
 
-  return !blockedByVeto;
+  const blockedByProfile = profile.dislikes.some(function(dislike) {
+    return meal.tags.includes(dislike) ||
+      meal.ingredients.includes(dislike) ||
+      meal.name.toLowerCase().includes(dislike);
+  });
+
+  return !blockedByVeto && !blockedByProfile && meal.minutes <= maxTime;
 }
 
 function mealScore(meal) {
@@ -171,6 +203,20 @@ function mealScore(meal) {
       }
     });
   });
+
+  profile.likes.forEach(function(like) {
+    if (
+      meal.tags.includes(like) ||
+      meal.ingredients.includes(like) ||
+      meal.name.toLowerCase().includes(like)
+    ) {
+      score += 3;
+    }
+  });
+
+  if (profile.cuisines.includes(meal.cuisine)) {
+    score += 4;
+  }
 
   return score;
 }
@@ -246,6 +292,10 @@ function renderFreshness() {
   freshnessLabel.textContent = labels[freshnessLevel];
 }
 
+function renderTime() {
+  timeLabel.textContent = "Up to " + maxTime + " minutes.";
+}
+
 function renderOnlineMemory() {
   onlineMemory.innerHTML = "";
 
@@ -285,7 +335,7 @@ function renderMeals() {
   if (allowedMeals.length === 0) {
     mealGrid.innerHTML = `
       <div class="empty-state">
-        No meals fit the rules yet. Remove a rule, lower freshness, or add a tonight-only override.
+        No meals fit the rules yet. Remove a rule, raise your time limit, or add a tonight-only override.
       </div>
     `;
     return;
@@ -298,6 +348,10 @@ function renderMeals() {
       <div class="meal-top">
         <h3>${meal.name}</h3>
         <p>${meal.note}</p>
+        <div class="meal-meta">
+          <span>${meal.minutes} min</span>
+          <span>${meal.cuisine}</span>
+        </div>
       </div>
       <div class="meal-body">
         <div class="tag-row"></div>
@@ -430,13 +484,16 @@ function resetDemo() {
   ratings = {};
   onlineLikes = [];
   freshnessLevel = 3;
+  maxTime = 40;
   freshnessRange.value = freshnessLevel;
+  timeRange.value = maxTime;
 
   saveToStorage("vetochef-vetoes", vetoes);
   saveToStorage("vetochef-pantry", pantryItems);
   saveToStorage("vetochef-ratings", ratings);
   saveToStorage("vetochef-online-likes", onlineLikes);
   localStorage.setItem("vetochef-freshness", freshnessLevel);
+  localStorage.setItem("vetochef-max-time", maxTime);
 
   render();
 }
@@ -446,6 +503,7 @@ function render() {
   renderPantry();
   renderOverrides();
   renderFreshness();
+  renderTime();
   renderOnlineMemory();
   renderMeals();
 }
@@ -463,6 +521,12 @@ resetButton.addEventListener("click", resetDemo);
 freshnessRange.addEventListener("input", function() {
   freshnessLevel = Number(freshnessRange.value);
   localStorage.setItem("vetochef-freshness", freshnessLevel);
+  render();
+});
+
+timeRange.addEventListener("input", function() {
+  maxTime = Number(timeRange.value);
+  localStorage.setItem("vetochef-max-time", maxTime);
   render();
 });
 

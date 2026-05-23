@@ -1,0 +1,41 @@
+.profile-layout {
+  width: min(980px, calc(100% - 40px));
+  margin: 34px auto 70px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.profile-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.profile-summary {
+  display: grid;
+  gap: 18px;
+}
+
+.summary-group {
+  display: grid;
+  gap: 10px;
+}
+
+.summary-group h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+@media (max-width: 800px) {
+  .profile-layout {
+    width: min(100% - 28px, 980px);
+    grid-template-columns: 1fr;
+  }
+
+  .profile-actions {
+    grid-template-columns: 1fr;
+  }
+}

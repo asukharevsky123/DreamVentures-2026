@@ -16,6 +16,17 @@
   justify-content: space-between;
 }
 
+.app-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-weight: 800;
+}
+
+.app-nav-links a {
+  text-decoration: none;
+}
+
 .nav-cta.dark {
   border-color: var(--line);
 }
@@ -252,6 +263,22 @@
   font-size: 0.95rem;
 }
 
+.meal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.meal-meta span {
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
 .meal-body {
   padding: 18px;
   display: flex;
@@ -354,6 +381,12 @@
   .app-nav {
     align-items: flex-start;
     gap: 14px;
+  }
+
+  .app-nav-links {
+    align-items: flex-end;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .meal-grid {

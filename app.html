@@ -11,7 +11,10 @@
   <header class="app-header">
     <nav class="app-nav" aria-label="Demo navigation">
       <a class="logo" href="index.html">VetoChef</a>
-      <a class="nav-cta dark" href="index.html">Back to landing</a>
+      <div class="app-nav-links">
+        <a href="profile.html">Profile</a>
+        <a class="nav-cta dark" href="index.html">Back to landing</a>
+      </div>
     </nav>
 
     <section class="app-intro">
@@ -77,6 +80,14 @@
         <label class="field-label" for="freshnessRange">General freshness level</label>
         <input id="freshnessRange" type="range" min="1" max="5" value="3">
         <p class="slider-note" id="freshnessLabel">Balanced: familiar, but not boring.</p>
+      </section>
+
+      <section class="app-card">
+        <p class="eyebrow">Time filter</p>
+        <h2>How much time do you have?</h2>
+        <label class="field-label" for="timeRange">Max cooking time</label>
+        <input id="timeRange" type="range" min="15" max="60" step="5" value="40">
+        <p class="slider-note" id="timeLabel">Up to 40 minutes.</p>
       </section>
 
       <section class="app-card">

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VetoChef Profile</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="profile.css">
+</head>
+<body class="app-body">
+  <header class="app-header">
+    <nav class="app-nav" aria-label="Profile navigation">
+      <a class="logo" href="index.html">VetoChef</a>
+      <div class="app-nav-links">
+        <a href="app.html">Demo app</a>
+        <a class="nav-cta dark" href="index.html">Back to landing</a>
+      </div>
+    </nav>
+
+    <section class="app-intro">
+      <p class="eyebrow">Profile</p>
+      <h1>Teach VetoChef what your house actually likes.</h1>
+      <p>
+        Save favorite foods, hard dislikes, and cuisines your household usually
+        says yes to. The demo app will use this profile when ranking meals.
+      </p>
+    </section>
+  </header>
+
+  <main class="profile-layout">
+    <section class="app-card">
+      <p class="eyebrow">Taste memory</p>
+      <h2>Household profile</h2>
+
+      <label class="field-label" for="profileName">Profile name</label>
+      <input id="profileName" type="text" placeholder="Our house">
+
+      <label class="field-label" for="likesInput">Things you like</label>
+      <textarea id="likesInput" rows="4" placeholder="salmon, pesto, rice, chicken"></textarea>
+
+      <label class="field-label" for="dislikesInput">Things you do not like</label>
+      <textarea id="dislikesInput" rows="4" placeholder="mushrooms, shellfish, spicy"></textarea>
+
+      <label class="field-label" for="cuisinesInput">Favorite cuisines</label>
+      <textarea id="cuisinesInput" rows="3" placeholder="italian, mexican, japanese"></textarea>
+
+      <div class="profile-actions">
+        <button class="button full-button" id="saveProfileButton" type="button">Save profile</button>
+        <button class="small-button" id="clearProfileButton" type="button">Clear profile</button>
+      </div>
+    </section>
+
+    <section class="app-card">
+      <p class="eyebrow">Saved</p>
+      <h2>What VetoChef remembers</h2>
+      <div class="profile-summary" id="profileSummary"></div>
+      <a class="button full-button" href="app.html">Use in demo app</a>
+    </section>
+  </main>
+
+  <script src="profile.js"></script>
+</body>
+</html>
