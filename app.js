@@ -9,38 +9,93 @@ const meals = [
     name: "Lemon salmon bowls",
     note: "Rice, salmon, cucumber, carrots, and lemon yogurt sauce.",
     tags: ["salmon", "rice", "mild", "pescatarian"],
+    ingredients: ["salmon", "rice", "cucumber", "carrots", "lemon", "yogurt"],
+    freshness: 4,
+    steps: [
+      "Cook the rice.",
+      "Season and cook the salmon.",
+      "Slice the cucumber and carrots.",
+      "Mix yogurt with lemon juice and salt.",
+      "Build bowls and spoon the sauce on top."
+    ],
     why: "Fits the rules without asking you to recalculate dinner."
   },
   {
     name: "Turkey taco skillet",
     note: "Ground turkey, beans, peppers, cheese, and warm tortillas.",
     tags: ["turkey", "beans", "peppers", "mild"],
+    ingredients: ["turkey", "beans", "peppers", "cheese", "tortillas"],
+    freshness: 3,
+    steps: [
+      "Brown the turkey in a skillet.",
+      "Add beans and chopped peppers.",
+      "Warm the tortillas.",
+      "Top with cheese and serve."
+    ],
     why: "A safe middle-ground dinner for a tired weeknight."
   },
   {
     name: "Mushroom risotto",
     note: "Creamy rice with mushrooms, parmesan, and herbs.",
     tags: ["mushrooms", "rice", "vegetarian"],
+    ingredients: ["mushrooms", "rice", "parmesan", "broth", "herbs"],
+    freshness: 2,
+    steps: [
+      "Cook mushrooms until browned.",
+      "Toast rice in the pan.",
+      "Add broth a little at a time.",
+      "Stir in parmesan and herbs."
+    ],
     why: "Comfort food, but only if mushrooms are allowed."
   },
   {
     name: "Spicy shrimp noodles",
     note: "Noodles, shrimp, chili sauce, scallions, and lime.",
     tags: ["spicy", "shellfish", "noodles"],
+    ingredients: ["shrimp", "noodles", "chili", "scallions", "lime"],
+    freshness: 5,
+    steps: [
+      "Boil the noodles.",
+      "Cook shrimp until pink.",
+      "Toss noodles with chili sauce and lime.",
+      "Add scallions and serve."
+    ],
     why: "Quick, but it depends on spice and shellfish being okay."
   },
   {
     name: "Friday pizza night",
     note: "Cheese pizza with side salad and optional toppings.",
     tags: ["pizza", "vegetarian", "mild"],
+    ingredients: ["pizza", "cheese", "salad"],
+    freshness: 1,
+    steps: [
+      "Heat the oven.",
+      "Bake the pizza.",
+      "Toss a quick salad.",
+      "Slice and serve."
+    ],
     why: "Keeps the easy fallback available when it fits."
   },
   {
     name: "Chicken pesto pasta",
     note: "Pasta, chicken, pesto, peas, and parmesan.",
     tags: ["chicken", "pasta", "mild"],
+    ingredients: ["chicken", "pasta", "pesto", "peas", "parmesan"],
+    freshness: 3,
+    steps: [
+      "Boil the pasta.",
+      "Cook the chicken.",
+      "Warm peas in the pasta water.",
+      "Toss everything with pesto and parmesan."
+    ],
     why: "Simple, familiar, and low-decision."
   }
+];
+
+const knownTags = [
+  "mushrooms", "spicy", "shellfish", "salmon", "rice", "turkey", "beans",
+  "peppers", "pizza", "vegetarian", "mild", "chicken", "pasta", "pesto",
+  "shrimp", "noodles", "cheese", "quick"
 ];
 
 const vetoForm = document.querySelector("#vetoForm");
@@ -50,26 +105,81 @@ const vetoList = document.querySelector("#vetoList");
 const mealGrid = document.querySelector("#mealGrid");
 const mealCount = document.querySelector("#mealCount");
 const resetButton = document.querySelector("#resetButton");
+const groceryInput = document.querySelector("#groceryInput");
+const scanButton = document.querySelector("#scanButton");
+const pantryList = document.querySelector("#pantryList");
+const overrideInput = document.querySelector("#overrideInput");
+const overrideButton = document.querySelector("#overrideButton");
+const overrideList = document.querySelector("#overrideList");
+const freshnessRange = document.querySelector("#freshnessRange");
+const freshnessLabel = document.querySelector("#freshnessLabel");
+const onlineInput = document.querySelector("#onlineInput");
+const onlinePerson = document.querySelector("#onlinePerson");
+const onlineButton = document.querySelector("#onlineButton");
+const onlineMemory = document.querySelector("#onlineMemory");
 
-let vetoes = loadVetoes();
+let vetoes = loadFromStorage("vetochef-vetoes", defaultVetoes);
+let pantryItems = loadFromStorage("vetochef-pantry", ["salmon", "rice", "chicken", "pasta"]);
+let tonightOverrides = [];
+let ratings = loadFromStorage("vetochef-ratings", {});
+let onlineLikes = loadFromStorage("vetochef-online-likes", []);
+let freshnessLevel = Number(localStorage.getItem("vetochef-freshness")) || 3;
 
-function loadVetoes() {
-  const saved = localStorage.getItem("vetochef-vetoes");
+freshnessRange.value = freshnessLevel;
+
+function loadFromStorage(key, fallback) {
+  const saved = localStorage.getItem(key);
   try {
-    return saved ? JSON.parse(saved) : defaultVetoes;
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(fallback));
   } catch {
-    return defaultVetoes;
+    return JSON.parse(JSON.stringify(fallback));
   }
 }
 
-function saveVetoes() {
-  localStorage.setItem("vetochef-vetoes", JSON.stringify(vetoes));
+function saveToStorage(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function activeVetoes() {
+  return vetoes.filter(function(veto) {
+    return !tonightOverrides.includes(veto.item.toLowerCase());
+  });
 }
 
 function mealIsAllowed(meal) {
-  return !vetoes.some(function(veto) {
+  const blockedByVeto = activeVetoes().some(function(veto) {
     return meal.tags.includes(veto.item.toLowerCase());
   });
+
+  return !blockedByVeto;
+}
+
+function mealScore(meal) {
+  let score = ratings[meal.name] || 0;
+  score += 5 - Math.abs(meal.freshness - freshnessLevel);
+
+  meal.ingredients.forEach(function(ingredient) {
+    if (pantryItems.includes(ingredient)) {
+      score += 1;
+    }
+  });
+
+  onlineLikes.forEach(function(memory) {
+    memory.tags.forEach(function(tag) {
+      if (meal.tags.includes(tag)) {
+        score += 2;
+      }
+    });
+  });
+
+  return score;
+}
+
+function makeChip(text) {
+  const chip = document.createElement("span");
+  chip.className = "chip";
+  chip.textContent = text;
+  return chip;
 }
 
 function renderVetoes() {
@@ -96,7 +206,7 @@ function renderVetoes() {
 
     removeButton.addEventListener("click", function() {
       vetoes.splice(index, 1);
-      saveVetoes();
+      saveToStorage("vetochef-vetoes", vetoes);
       render();
     });
 
@@ -104,15 +214,78 @@ function renderVetoes() {
   });
 }
 
+function renderPantry() {
+  pantryList.innerHTML = "";
+  pantryItems.forEach(function(item) {
+    pantryList.appendChild(makeChip(item));
+  });
+}
+
+function renderOverrides() {
+  overrideList.innerHTML = "";
+
+  if (tonightOverrides.length === 0) {
+    overrideList.appendChild(makeChip("No overrides tonight"));
+    return;
+  }
+
+  tonightOverrides.forEach(function(item) {
+    overrideList.appendChild(makeChip(item));
+  });
+}
+
+function renderFreshness() {
+  const labels = {
+    1: "Very flexible: leftovers and easy defaults are fine.",
+    2: "Comfortable: familiar dinners are welcome.",
+    3: "Balanced: familiar, but not boring.",
+    4: "Fresh: prioritize brighter, lighter ideas.",
+    5: "Very fresh: only the newest-feeling meals."
+  };
+
+  freshnessLabel.textContent = labels[freshnessLevel];
+}
+
+function renderOnlineMemory() {
+  onlineMemory.innerHTML = "";
+
+  if (onlineLikes.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "memory-item";
+    empty.textContent = "No online ideas saved yet.";
+    onlineMemory.appendChild(empty);
+    return;
+  }
+
+  onlineLikes.forEach(function(memory) {
+    const item = document.createElement("div");
+    const title = document.createElement("strong");
+    const detail = document.createElement("span");
+
+    item.className = "memory-item";
+    title.textContent = memory.person + " liked this";
+    detail.textContent = memory.tags.join(", ");
+    item.appendChild(title);
+    item.appendChild(detail);
+    onlineMemory.appendChild(item);
+  });
+}
+
 function renderMeals() {
-  const allowedMeals = meals.filter(mealIsAllowed);
+  const allowedMeals = meals
+    .filter(mealIsAllowed)
+    .sort(function(a, b) {
+      return mealScore(b) - mealScore(a);
+    })
+    .slice(0, 3);
+
   mealGrid.innerHTML = "";
   mealCount.textContent = allowedMeals.length + " fit";
 
   if (allowedMeals.length === 0) {
     mealGrid.innerHTML = `
       <div class="empty-state">
-        No meals fit the rules yet. Remove a rule or add more recipes to the demo.
+        No meals fit the rules yet. Remove a rule, lower freshness, or add a tonight-only override.
       </div>
     `;
     return;
@@ -129,6 +302,11 @@ function renderMeals() {
       <div class="meal-body">
         <div class="tag-row"></div>
         <p class="why-text">${meal.why}</p>
+        <div class="meal-actions">
+          <p class="rating-note">Your rating: ${ratings[meal.name] || "not rated"}</p>
+          <div class="rating-row"></div>
+          <button class="cook-button" type="button">Read steps aloud</button>
+        </div>
       </div>
     `;
 
@@ -141,6 +319,23 @@ function renderMeals() {
         addVeto(tag, "Demo user");
       });
       tagRow.appendChild(button);
+    });
+
+    const ratingRow = card.querySelector(".rating-row");
+    [1, 2, 3, 4, 5].forEach(function(number) {
+      const ratingButton = document.createElement("button");
+      ratingButton.type = "button";
+      ratingButton.textContent = number;
+      ratingButton.addEventListener("click", function() {
+        ratings[meal.name] = number;
+        saveToStorage("vetochef-ratings", ratings);
+        render();
+      });
+      ratingRow.appendChild(ratingButton);
+    });
+
+    card.querySelector(".cook-button").addEventListener("click", function() {
+      readSteps(meal);
     });
 
     mealGrid.appendChild(card);
@@ -159,15 +354,99 @@ function addVeto(item, person) {
 
   if (!alreadyExists) {
     vetoes.push({ item: cleanItem, person: person });
-    saveVetoes();
+    saveToStorage("vetochef-vetoes", vetoes);
   }
 
   vetoInput.value = "";
   render();
 }
 
+function scanGroceries() {
+  const items = groceryInput.value
+    .split(/[\n,]+/)
+    .map(function(item) {
+      return item.trim().toLowerCase();
+    })
+    .filter(Boolean);
+
+  if (items.length > 0) {
+    pantryItems = items;
+    saveToStorage("vetochef-pantry", pantryItems);
+  }
+
+  render();
+}
+
+function addOverride() {
+  const override = overrideInput.value.trim().toLowerCase();
+  if (override && !tonightOverrides.includes(override)) {
+    tonightOverrides.push(override);
+  }
+
+  overrideInput.value = "";
+  render();
+}
+
+function saveOnlineIdea() {
+  const text = onlineInput.value.toLowerCase();
+  const tags = knownTags.filter(function(tag) {
+    return text.includes(tag);
+  });
+
+  if (tags.length === 0 && text.trim()) {
+    tags.push(text.trim().split(/\s+/)[0]);
+  }
+
+  if (tags.length > 0) {
+    onlineLikes.unshift({
+      person: onlinePerson.value,
+      tags: tags.slice(0, 4)
+    });
+
+    onlineLikes = onlineLikes.slice(0, 4);
+    saveToStorage("vetochef-online-likes", onlineLikes);
+  }
+
+  onlineInput.value = "";
+  render();
+}
+
+function readSteps(meal) {
+  const text = meal.name + ". " + meal.steps.join(" ");
+
+  if (!("speechSynthesis" in window)) {
+    alert("Your browser does not support read-aloud cooking steps.");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+}
+
+function resetDemo() {
+  vetoes = defaultVetoes.slice();
+  pantryItems = ["salmon", "rice", "chicken", "pasta"];
+  tonightOverrides = [];
+  ratings = {};
+  onlineLikes = [];
+  freshnessLevel = 3;
+  freshnessRange.value = freshnessLevel;
+
+  saveToStorage("vetochef-vetoes", vetoes);
+  saveToStorage("vetochef-pantry", pantryItems);
+  saveToStorage("vetochef-ratings", ratings);
+  saveToStorage("vetochef-online-likes", onlineLikes);
+  localStorage.setItem("vetochef-freshness", freshnessLevel);
+
+  render();
+}
+
 function render() {
   renderVetoes();
+  renderPantry();
+  renderOverrides();
+  renderFreshness();
+  renderOnlineMemory();
   renderMeals();
 }
 
@@ -176,9 +455,14 @@ vetoForm.addEventListener("submit", function(event) {
   addVeto(vetoInput.value, personSelect.value);
 });
 
-resetButton.addEventListener("click", function() {
-  vetoes = defaultVetoes.slice();
-  saveVetoes();
+scanButton.addEventListener("click", scanGroceries);
+overrideButton.addEventListener("click", addOverride);
+onlineButton.addEventListener("click", saveOnlineIdea);
+resetButton.addEventListener("click", resetDemo);
+
+freshnessRange.addEventListener("input", function() {
+  freshnessLevel = Number(freshnessRange.value);
+  localStorage.setItem("vetochef-freshness", freshnessLevel);
   render();
 });
 
