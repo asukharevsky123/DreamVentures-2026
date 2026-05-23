@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VetoChef Demo App</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body class="app-body">
+  <header class="app-header">
+    <nav class="app-nav" aria-label="Demo navigation">
+      <a class="logo" href="index.html">VetoChef</a>
+      <a class="nav-cta dark" href="index.html">Back to landing</a>
+    </nav>
+
+    <section class="app-intro">
+      <p class="eyebrow">Demo app</p>
+      <h1>Dinner suggestions that remember the rules for you.</h1>
+      <p>
+        This is a lightweight prototype. Add the things you normally have to
+        keep in your head, and VetoChef removes meals that break those rules.
+      </p>
+    </section>
+  </header>
+
+  <main class="app-layout">
+    <aside class="app-card">
+      <div class="card-title-row">
+        <div>
+          <p class="eyebrow">Offloaded memory</p>
+          <h2>Dinner rules</h2>
+        </div>
+        <button class="small-button" id="resetButton" type="button">Reset</button>
+      </div>
+
+      <form class="veto-form" id="vetoForm">
+        <label for="vetoInput">Thing to stop remembering</label>
+        <input id="vetoInput" name="veto" type="text" placeholder="mushrooms, spicy, shellfish">
+
+        <label for="personSelect">Who vetoed it?</label>
+        <select id="personSelect" name="person">
+          <option>Jordan</option>
+          <option>Maya</option>
+          <option>Sam</option>
+          <option>Dad</option>
+        </select>
+
+        <button class="button full-button" type="submit">Add veto</button>
+      </form>
+
+      <div class="veto-list" id="vetoList" aria-live="polite"></div>
+    </aside>
+
+    <section class="app-card meal-area">
+      <div class="card-title-row">
+        <div>
+          <p class="eyebrow">Tonight</p>
+          <h2>Options without the calculation</h2>
+        </div>
+        <div class="meal-count" id="mealCount">0 clear</div>
+      </div>
+
+      <div class="meal-grid" id="mealGrid"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
