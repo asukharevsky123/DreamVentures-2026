@@ -25,31 +25,75 @@
   </header>
 
   <main class="app-layout">
-    <aside class="app-card">
-      <div class="card-title-row">
-        <div>
-          <p class="eyebrow">Offloaded memory</p>
-          <h2>Dinner rules</h2>
+    <aside class="app-stack">
+      <section class="app-card">
+        <div class="card-title-row">
+          <div>
+            <p class="eyebrow">Offloaded memory</p>
+            <h2>Dinner rules</h2>
+          </div>
+          <button class="small-button" id="resetButton" type="button">Reset</button>
         </div>
-        <button class="small-button" id="resetButton" type="button">Reset</button>
-      </div>
 
-      <form class="veto-form" id="vetoForm">
-        <label for="vetoInput">Thing to stop remembering</label>
-        <input id="vetoInput" name="veto" type="text" placeholder="mushrooms, spicy, shellfish">
+        <form class="veto-form" id="vetoForm">
+          <label for="vetoInput">Thing to stop remembering</label>
+          <input id="vetoInput" name="veto" type="text" placeholder="mushrooms, spicy, shellfish">
 
-        <label for="personSelect">Who vetoed it?</label>
-        <select id="personSelect" name="person">
+          <label for="personSelect">Who is this for?</label>
+          <select id="personSelect" name="person">
+            <option>Jordan</option>
+            <option>Maya</option>
+            <option>Sam</option>
+            <option>Dad</option>
+          </select>
+
+          <button class="button full-button" type="submit">Remember rule</button>
+        </form>
+
+        <div class="veto-list" id="vetoList" aria-live="polite"></div>
+      </section>
+
+      <section class="app-card">
+        <p class="eyebrow">Grocery scan</p>
+        <h2>What's already home</h2>
+        <label class="field-label" for="groceryInput">Paste a grocery list or fridge note</label>
+        <textarea id="groceryInput" rows="5" placeholder="salmon&#10;rice&#10;chicken&#10;pasta"></textarea>
+        <button class="button full-button" id="scanButton" type="button">Scan list</button>
+        <div class="chip-list" id="pantryList"></div>
+      </section>
+
+      <section class="app-card">
+        <p class="eyebrow">Tonight only</p>
+        <h2>Override a rule</h2>
+        <label class="field-label" for="overrideInput">Allow this just for tonight</label>
+        <input id="overrideInput" type="text" placeholder="spicy">
+        <button class="button full-button" id="overrideButton" type="button">Add override</button>
+        <div class="chip-list" id="overrideList"></div>
+      </section>
+
+      <section class="app-card">
+        <p class="eyebrow">Freshness</p>
+        <h2>How fresh should it feel?</h2>
+        <label class="field-label" for="freshnessRange">General freshness level</label>
+        <input id="freshnessRange" type="range" min="1" max="5" value="3">
+        <p class="slider-note" id="freshnessLabel">Balanced: familiar, but not boring.</p>
+      </section>
+
+      <section class="app-card">
+        <p class="eyebrow">Online food memory</p>
+        <h2>Send an idea to VetoChef</h2>
+        <label class="field-label" for="onlineInput">Paste a recipe link, meal name, or food post</label>
+        <textarea id="onlineInput" rows="4" placeholder="crispy chicken pesto pasta from TikTok"></textarea>
+        <label class="field-label" for="onlinePerson">Who seemed into it?</label>
+        <select id="onlinePerson">
           <option>Jordan</option>
           <option>Maya</option>
           <option>Sam</option>
           <option>Dad</option>
         </select>
-
-        <button class="button full-button" type="submit">Add veto</button>
-      </form>
-
-      <div class="veto-list" id="vetoList" aria-live="polite"></div>
+        <button class="button full-button" id="onlineButton" type="button">Send to memory</button>
+        <div class="memory-list" id="onlineMemory"></div>
+      </section>
     </aside>
 
     <section class="app-card meal-area">
@@ -58,7 +102,7 @@
           <p class="eyebrow">Tonight</p>
           <h2>Options without the calculation</h2>
         </div>
-        <div class="meal-count" id="mealCount">0 clear</div>
+        <div class="meal-count" id="mealCount">0 fit</div>
       </div>
 
       <div class="meal-grid" id="mealGrid"></div>
